@@ -1,0 +1,16 @@
+{
+    "features": [
+        "amount",
+        "hour_of_day",
+        "velocity_1h",
+        "velocity_24h",
+        "recipient_age_days",
+        "device_changed",
+        "is_new_recipient",
+        "failed_pin_attempts",
+        "time_to_cashout_mins"
+    ],
+    "optimal_threshold": 0.7,
+    "roc_auc": 1.0,
+    "pr_auc": 1.0
+}
