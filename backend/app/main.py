@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from backend.app.services.graph_services import mule_graph_engine
 import joblib
 import json
 import numpy as np
@@ -141,3 +142,12 @@ def evaluate_transaction(tx: TransactionPayload):
             "message": lexicon["customer_prompt"] if show_customer_modal else ""
         }
     }
+
+
+@app.get("/api/v1/graph/trace/{wallet_id}")
+def get_wallet_network_trace(wallet_id: str):
+    """
+    Returns the network graph and mule transit chain for any flagged wallet.
+    """
+    graph_data = mule_graph_engine.trace_mule_chain(wallet_id)
+    return graph_data
