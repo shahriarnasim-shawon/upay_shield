@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.app.services.graph_services import mule_graph_engine
+from backend.app.services.copilot_services import copilot_service
 import joblib
 import json
 import numpy as np
@@ -55,6 +56,18 @@ class TransactionPayload(BaseModel):
     time_to_cashout_mins: int = Field(default=600, example=8)
     # 'bn' for Bangla, 'en' for English
     lang: str = Field(default="bn", example="bn")
+
+
+class CopilotRequest(BaseModel):
+    tx_id: str = "UPY_991823"
+    sender_wallet: str = "01711223344"
+    receiver_wallet: str = "01999887766"
+    amount: float = 24500.0
+    risk_score: float = 88.5
+    top_factors: list[str] = [
+        "New recipient registered 1 hour ago", "Immediate cash-out pattern"]
+    mule_detected: bool = True
+    lang: str = "bn"  # 'bn' or 'en'
 
 
 # Bilingual Message Dictionary
@@ -151,3 +164,13 @@ def get_wallet_network_trace(wallet_id: str):
     """
     graph_data = mule_graph_engine.trace_mule_chain(wallet_id)
     return graph_data
+
+
+@app.post("/api/v1/copilot/investigate")
+def generate_investigation_brief(req: CopilotRequest):
+    """
+    Generates an AI-driven investigation brief in English or Bangla.
+    """
+    brief = copilot_service.generate_investigation_brief(
+        req.model_dump(), lang=req.lang)
+    return brief
